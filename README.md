@@ -1,6 +1,6 @@
 # Statistical Signal Processing and Inference
 
-This repo hosts the MATLAB code and report for the SSPI coursework. This covers techniques from time-series analysis, machine learning and statistical modelling. Each section includes processing of <span style="color : red"><b><u>real world time-series signals</u></b></span>. 
+This repo hosts the MATLAB code and report for the SSPI coursework. This covers techniques from time-series analysis, machine learning and statistical modelling. Each section includes processing of <span style="color : red"><b><u>real world time-series signals</u></b></span>. For example: **Speech Recognition** and **NASDAQ close price modelling**.
 
 You can checkout the report [here](01871216_SSPI_Coursework.pdf).
 
