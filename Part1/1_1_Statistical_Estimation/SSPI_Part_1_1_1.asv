@@ -1,0 +1,20 @@
+% 1.1 Theoretical and sample mean
+
+% Plot x[n] realisations
+clf;
+x = rand(1000,1);
+fig1 = figure(1); hold on;
+boxplot(x); title('Display of X_{n}, a stationary stochastic process');
+s = scatter(ones(size(x)), x, 'filled');
+alpha(s, 0.15);
+legend('x[n], realisation of stochastic process');
+xticks([]); ylabel('Value of x[n] (AU)')
+set(gca, 'YAxisLocation', 'origin')
+xlim([0.5 1.5])
+hold off;
+
+% Calculate theoretical mean
+theoretical = 1/2;  
+
+
+

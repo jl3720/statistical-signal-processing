@@ -1,0 +1,120 @@
+% 3.0 Test pgm
+
+x1 = randn(128, 1);
+x2 = randn(256, 1);
+x3 = randn(512, 1);
+
+[P1, w1] = pgm(x1);
+[P2, w2] = pgm(x2);
+[P3, w3] = pgm(x3);
+
+figure(1);
+subplot(1,3,1)
+plot(w1./2./pi, P1)
+subplot(1,3,2)
+plot(w2./2./pi, P2)
+subplot(1,3,3)
+plot(w3./2./pi, P3)
+%% 3.1 Averaged periodogram estimates
+clc;
+
+b = 0.2*[1 1 1 1 1];  % Denominator TF coefficients
+a = 1;  % Numerator TF coefficients
+fP1 = filter(b,a, P1);  % Check why not centered around 1
+fP2 = filter(b,a, P2);
+fP3 = filter(b,a, P3);
+
+figure(3);
+t = tiledlayout(1,3);
+title(t, 'Periodograms after smoothing with MA filter')
+xlabel(t, 'Normalised Frequency, f')
+ylabel(t, 'PSD Estimate')
+nexttile;
+plot(w1/2/pi, fP1)
+legend('N=128')
+
+nexttile;
+plot(w2/2/pi, fP2)
+legend('N=256')
+
+nexttile;
+plot(w3/2/pi, fP3)
+legend('N=512')
+
+%% 3.1.2 PSD estimates for segments
+clc;
+
+WGN = randn(1024,1);
+realisations = reshape(WGN, [8, 128]);
+size(realisations)
+periodograms = zeros(8, 128+1);
+frequencies = zeros(8,128+1);
+
+figure(1); clf; hold on; grid on;
+for i=1:8
+    [periodograms(i,:), frequencies(i,:)] = pgm(realisations(i,:));
+    plot(frequencies(i,:), periodograms(i,:), 'DisplayName', num2str(i))  % Note wants subplots if showing
+end
+legend('show')
+
+figure(2); clf;
+k=3;
+plot(frequencies(k,:), periodograms(k,:))
+% Large variation in PSD estimates
+
+%% 3.1.3 Averaged Periodogram
+
+avg_P = mean(periodograms, 1);
+figure(2); clf; grid on;
+plot(frequencies(1,:)/2/pi, avg_P)
+title('Averaged Periodogram')
+ylabel('PSD Estimate')
+xlabel('Normalised frequency, f')  % Check why std so low / not centered at 1
+
+%% 3.2.1 Spectrum of autoregressive processes
+
+x = randn(1064,1);  % WGN
+
+b= [1];
+a = [1 0.9];
+
+y_unf = filter(b,a, x);  % Generate AR(1) process
+y = y_unf(40:end);
+
+% Plot x and y in time do
+figure(1);
+t= tiledlayout(2,1);
+
+nexttile;
+plot(x); grid on;
+xlabel('Sample number, n')
+ylabel('Signal value, x[n]')
+title('Plot of x[n], WGN in time domain')
+xlim([0 1050])
+
+nexttile(t);
+plot(y); grid on;
+xlabel('Sample number, n')
+ylabel('Signal value, y[n]')
+title('Plot of y[n], AR(1) realisation in time domain')
+xlim([0 1050])
+
+[h,w] = freqz(b, a, 512);  % Get Transfer Function
+figure(3); clf; grid on;
+plot(w/2/pi, abs(h).^2);
+title('PSD of AR(1) Process')
+xlabel('Normalised frequency, f')
+ylabel('PSD')
+
+figure(4); clf;
+[ACF, lags] = xcorr(y, 'unbiased');
+stem(lags(ismember(lags, 1:20)), ACF(ismember(lags, 1:20)))
+xlabel('Autocorrelation lag, \tau')
+ylabel('ACF')
+title('ACF for realisation of AR(1) process')
+
+%% 3.2.2 Periodogram
+figure(3); hold on;
+[Pyy, w] = pgm(y);
+plot(w/2/pi, Pyy, 'r')
+legend('Theoretical PSD', 'Periodogram Estimate')
